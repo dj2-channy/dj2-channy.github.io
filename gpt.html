@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>실험용 쇼핑 검색 결과 (Grid vs List)</title>
+  <style>
+    :root{
+      --bg:#f6f7f9;
+      --card:#fff;
+      --text:#111;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --brand:#03c75a;
+      --accent:#2563eb;
+      --chip:#eef2ff;
+      --danger:#ef4444;
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+      --radius: 14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+      color:var(--text);
+      background:var(--bg);
+    }
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background:#fff;
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px; margin:0 auto;
+      padding:12px 16px;
+      display:flex; gap:12px; align-items:center;
+    }
+    .logo{
+      font-weight:800; letter-spacing:-.5px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .logo-badge{
+      width:22px; height:22px; border-radius:6px;
+      background:var(--brand);
+      display:inline-block;
+    }
+    .search{
+      flex:1;
+      display:flex; gap:8px; align-items:center;
+      background:#f3f4f6;
+      border:1px solid #eef0f3;
+      padding:10px 12px;
+      border-radius:999px;
+    }
+    .search input{
+      border:0; outline:none; background:transparent;
+      width:100%;
+      font-size:14px;
+    }
+    .top-actions{
+      display:flex; gap:8px; align-items:center;
+    }
+    .btn{
+      border:1px solid var(--line);
+      background:#fff;
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:13px;
+      cursor:pointer;
+    }
+    .btn.primary{
+      border-color:transparent;
+      background:var(--accent);
+      color:#fff;
+    }
+
+    /* Layout */
+    .container{
+      max-width:1200px;
+      margin:16px auto;
+      padding:0 16px 40px;
+      display:grid;
+      grid-template-columns: 260px 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .container{grid-template-columns:1fr}
+      .sidebar{position:static}
+    }
+
+    /* Sidebar */
+    .sidebar{
+      position:sticky; top:70px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+    }
+    .sb-title{
+      font-size:14px;
+      font-weight:800;
+      margin:0 0 10px;
+    }
+    .sb-group{
+      border-top:1px solid var(--line);
+      padding-top:12px;
+      margin-top:12px;
+    }
+    .sb-group:first-of-type{border-top:0; padding-top:0; margin-top:0}
+    .sb-group h4{
+      font-size:13px;
+      margin:0 0 8px;
+    }
+    .check{
+      display:flex; align-items:center; gap:8px;
+      font-size:13px;
+      color:#1f2937;
+      margin:6px 0;
+    }
+    .check input{accent-color: var(--brand)}
+    .range{
+      display:flex; gap:8px; align-items:center;
+      margin-top:8px;
+    }
+    .range input{
+      width:100%;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      font-size:13px;
+      outline:none;
+      background:#fff;
+    }
+    .hint{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
+    }
+
+    /* Main */
+    .main{
+      min-width:0;
+    }
+    .toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .result-title{
+      font-weight:800;
+      letter-spacing:-.3px;
+    }
+    .chips{display:flex; gap:6px; flex-wrap:wrap}
+    .chip{
+      background:var(--chip);
+      border:1px solid #dbeafe;
+      color:#1e40af;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.active{
+      background:#dbeafe;
+      border-color:#bfdbfe;
+      font-weight:700;
+    }
+
+    /* Product grid/list */
+    .products{
+      display:grid;
+      gap:14px;
+    }
+    .products.grid{
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    @media (max-width: 1100px){
+      .products.grid{grid-template-columns: repeat(3, minmax(0, 1fr));}
+    }
+    @media (max-width: 760px){
+      .products.grid{grid-template-columns: repeat(2, minmax(0, 1fr));}
+    }
+    .products.list{
+      grid-template-columns: 1fr;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+    }
+
+    /* list mode card layout */
+    .products.list .card{
+      flex-direction:row;
+      align-items:stretch;
+    }
+
+    .thumb{
+      position:relative;
+      background:#f3f4f6;
+      aspect-ratio: 1 / 1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .products.list .thumb{
+      width:220px;
+      aspect-ratio:auto;
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .fav{
+      position:absolute;
+      right:10px;
+      top:10px;
+      width:32px; height:32px;
+      border-radius:999px;
+      background:rgba(255,255,255,.95);
+      border:1px solid rgba(0,0,0,.06);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer;
+      font-size:16px;
+    }
+    .badge{
+      position:absolute;
+      left:10px;
+      top:10px;
+      background:#111;
+      color:#fff;
+      font-size:11px;
+      padding:6px 8px;
+      border-radius:999px;
+      opacity:.92;
+    }
+    .badge.green{background:var(--brand)}
+    .badge.blue{background:var(--accent)}
+    .badge.red{background:var(--danger)}
+
+    .content{
+      padding:12px 12px 14px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:0;
+      flex:1;
+    }
+    .title{
+      font-size:13px;
+      line-height:1.35;
+      font-weight:800;
+      margin:0;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .meta{
+      display:flex; gap:6px; flex-wrap:wrap;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .price-row{
+      display:flex;
+      align-items:baseline;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .price{
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:-.3px;
+    }
+    .won{font-size:13px; font-weight:700; color:#111}
+    .discount{
+      color:var(--danger);
+      font-weight:800;
+      font-size:13px;
+    }
+    .sub{
+      color:var(--muted);
+      font-size:12px;
+    }
+    .rating{
+      display:flex; gap:6px; align-items:center;
+      font-size:12px;
+      color:#111;
+    }
+    .star{color:#f59e0b}
+    .actions{
+      margin-top:auto;
+      display:flex;
+      gap:8px;
+    }
+    .actions button{
+      flex:1;
+      border-radius:10px;
+      border:1px solid var(--line);
+      padding:10px 10px;
+      font-size:13px;
+      cursor:pointer;
+      background:#fff;
+    }
+    .actions button.primary{
+      background: #111;
+      color:#fff;
+      border-color:#111;
+    }
+
+    /* floating helper */
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:#111;
+      color:#fff;
+      padding:10px 12px;
+      border-radius:999px;
+      font-size:13px;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease;
+    }
+    .toast.show{opacity:.95}
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">
+        <span class="logo-badge"></span>
+        실험용 쇼핑
+      </div>
+
+      <div class="search" role="search">
+        🔎
+        <input id="q" type="search" value="스마트폰 액세서리" aria-label="검색어" />
+      </div>
+
+      <div class="top-actions">
+        <button class="btn" id="toggleLayoutBtn" title="리스트/격자 전환">레이아웃 전환</button>
+        <button class="btn primary" id="resetBtn">초기화</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <p class="sb-title">필터</p>
+
+      <div class="sb-group">
+        <h4>브랜드</h4>
+        <label class="check"><input type="checkbox" name="brand" value="공식브랜드"> 공식브랜드</label>
+        <label class="check"><input type="checkbox" name="brand" value="공식인증"> 공식인증</label>
+      </div>
+
+      <div class="sb-group">
+        <h4>배송</h4>
+        <label class="check"><input type="checkbox" name="ship" value="무료배송"> 무료배송</label>
+        <label class="check"><input type="checkbox" name="ship" value="오늘출발"> 오늘출발</label>
+      </div>
+
+      <div class="sb-group">
+        <h4>평점</h4>
+        <label class="check"><input type="checkbox" name="rating" value="4.8+"> ★ 4.8 이상</label>
+        <p class="hint">실습용이므로 필터는 UI만 구성되어 있고, 적용은 선택적으로 구현하세요.</p>
+      </div>
+
+      <div class="sb-group">
+        <h4>가격</h4>
+        <div class="range">
+          <input type="number" placeholder="최소" id="minPrice" />
+          <span class="hint">~</span>
+          <input type="number" placeholder="최대" id="maxPrice" />
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <section class="main">
+      <div class="toolbar">
+        <div>
+          <div class="result-title"><span id="queryText">스마트폰 액세서리</span> 검색 결과</div>
+          <div class="sub">실험용 데모 페이지 · Grid vs List A/B 테스트에 적합</div>
+        </div>
+        <div class="chips" aria-label="정렬/옵션">
+          <div class="chip active" data-sort="popular">인기순</div>
+          <div class="chip" data-sort="priceLow">낮은 가격순</div>
+          <div class="chip" data-sort="ratingHigh">평점순</div>
+        </div>
+      </div>
+
+      <div id="products" class="products grid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast">이벤트 기록됨</div>
+
+  <script>
+    /**
+     * 실험용 데이터 (이미지: SVG data URI로 대체)
+     * - 실제 네이버 이미지/리소스는 사용하지 않음
+     */
+    const img = (label, bg="#e5e7eb") => {
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
+          <rect width="100%" height="100%" fill="${bg}"/>
+          <circle cx="300" cy="240" r="140" fill="rgba(0,0,0,.08)"/>
+          <text x="50%" y="62%" text-anchor="middle" font-family="Arial" font-size="42" fill="rgba(0,0,0,.55)">${label}</text>
+        </svg>`;
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    };
+
+    const initialProducts = [
+      { id: 1, name: "마그네틱 지문방지 케이스", brand:"공식", price:19900, discount:33, rating:4.7, reviews:2368, badge:"우수딜", badgeColor:"blue", ship:"무료배송", image: img("CASE 01", "#d1fae5") },
+      { id: 2, name: "투명 범퍼 케이스 (에어)", brand:"인증", price:4800, discount:46, rating:4.8, reviews:10454, badge:"인증", badgeColor:"green", ship:"오늘출발", image: img("CASE 02", "#dbeafe") },
+      { id: 3, name: "맥세이프 링 케이스", brand:"공식", price:22300, discount:30, rating:4.79, reviews:15328, badge:"공식", badgeColor:"green", ship:"무료배송", image: img("CASE 03", "#e0e7ff") },
+      { id: 4, name: "에어팟 프로 맥핏 케이스", brand:"공식", price:55250, discount:15, rating:4.83, reviews:4222, badge:"슈퍼딜", badgeColor:"blue", ship:"무료배송", image: img("AIRPODS", "#fee2e2") },
+      { id: 5, name: "카드 수납 범퍼 케이스", brand:"", price:10900, discount:43, rating:4.79, reviews:20548, badge:"", badgeColor:"", ship:"오늘출발", image: img("CARD", "#fef3c7") },
+      { id: 6, name: "파우치형 힌지 보호 케이스", brand:"", price:37900, discount:24, rating:4.74, reviews:5645, badge:"광고", badgeColor:"red", ship:"", image: img("POUCH", "#ede9fe") },
+      { id: 7, name: "카드 2장 수납 케이스", brand:"", price:9900, discount:34, rating:4.75, reviews:10575, badge:"우수딜", badgeColor:"blue", ship:"오늘출발", image: img("WALLET", "#cffafe") },
+      { id: 8, name: "실리콘 그립 맥세이프 케이스", brand:"공식", price:17900, discount:40, rating:4.81, reviews:2040, badge:"공식", badgeColor:"green", ship:"무료배송", image: img("GRIP", "#f1f5f9") },
+    ];
+
+    let products = [...initialProducts];
+    let layout = getQueryParam("layout") || "grid"; // grid | list
+
+    // A/B 테스트를 위해 URL 파라미터로 레이아웃 고정 가능:
+    // ?layout=grid 또는 ?layout=list
+    function getQueryParam(key){
+      const url = new URL(location.href);
+      return url.searchParams.get(key);
+    }
+
+    // 가벼운 이벤트 로깅 (VWO goal 연결용)
+    window.dataLayer = window.dataLayer || [];
+    function track(eventName, payload={}){
+      const evt = { event: eventName, ...payload, ts: Date.now() };
+      window.dataLayer.push(evt);
+      console.log("[track]", evt);
+      showToast(`이벤트: ${eventName}`);
+    }
+
+    const toastEl = document.getElementById("toast");
+    let toastTimer = null;
+    function showToast(text){
+      toastEl.textContent = text;
+      toastEl.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 900);
+    }
+
+    function formatWon(n){
+      return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "원";
+    }
+
+    function render(){
+      const wrap = document.getElementById("products");
+      wrap.classList.toggle("grid", layout === "grid");
+      wrap.classList.toggle("list", layout === "list");
+
+      wrap.innerHTML = products.map(p => `
+        <article class="card" data-id="${p.id}">
+          <div class="thumb">
+            ${p.badge ? `<div class="badge ${p.badgeColor}">${p.badge}</div>` : ``}
+            <button class="fav" aria-label="찜" data-action="fav">♡</button>
+            <img src="${p.image}" alt="${p.name}" />
+          </div>
+
+          <div class="content">
+            <h3 class="title">${p.name}</h3>
+            <div class="meta">
+              ${p.brand ? `<span>${p.brand}</span>` : ``}
+              ${p.ship ? `<span>· ${p.ship}</span>` : ``}
+            </div>
+
+            <div class="price-row">
+              ${p.discount ? `<span class="discount">${p.discount}%</span>` : ``}
+              <span class="price">${formatWon(p.price)}</span>
+            </div>
+
+            <div class="rating">
+              <span class="star">★</span>
+              <strong>${p.rating.toFixed(2)}</strong>
+              <span class="sub">리뷰 ${p.reviews.toLocaleString()}</span>
+            </div>
+
+            <div class="actions">
+              <button class="primary" data-action="view">자세히 보기</button>
+              <button data-action="add">장바구니</button>
+            </div>
+          </div>
+        </article>
+      `).join("");
+
+      document.getElementById("queryText").textContent =
+        document.getElementById("q").value.trim() || "검색";
+    }
+
+    // sort chips
+    document.querySelectorAll(".chip").forEach(chip=>{
+      chip.addEventListener("click", ()=>{
+        document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+        chip.classList.add("active");
+        const sort = chip.dataset.sort;
+
+        if(sort === "popular"){
+          products = [...initialProducts];
+        } else if(sort === "priceLow"){
+          products = [...products].sort((a,b)=>a.price-b.price);
+        } else if(sort === "ratingHigh"){
+          products = [...products].sort((a,b)=>b.rating-a.rating);
+        }
+        track("sort_change", { sort, layout });
+        render();
+      });
+    });
+
+    // layout toggle
+    const toggleLayoutBtn = document.getElementById("toggleLayoutBtn");
+    toggleLayoutBtn.addEventListener("click", ()=>{
+      layout = (layout === "grid") ? "list" : "grid";
+      track("layout_toggle", { layout });
+      render();
+    });
+
+    // reset
+    document.getElementById("resetBtn").addEventListener("click", ()=>{
+      products = [...initialProducts];
+      layout = "grid";
+      document.querySelectorAll(".chip").forEach((c,i)=>{
+        c.classList.toggle("active", i===0);
+      });
+      track("reset", {});
+      render();
+    });
+
+    // card actions (event delegation)
+    document.getElementById("products").addEventListener("click", (e)=>{
+      const btn = e.target.closest("button[data-action]");
+      if(!btn) return;
+      const card = e.target.closest(".card");
+      const id = Number(card?.dataset?.id);
+      const p = products.find(x=>x.id===id);
+      const action = btn.dataset.action;
+
+      if(action === "fav"){
+        btn.textContent = (btn.textContent === "♡") ? "♥" : "♡";
+        track("favorite_toggle", { product_id:id, name:p?.name, layout });
+      }
+      if(action === "view"){
+        track("product_view_click", { product_id:id, name:p?.name, price:p?.price, layout });
+        alert(`(실험용) 상세 페이지로 이동: ${p?.name}`);
+      }
+      if(action === "add"){
+        track("add_to_cart_click", { product_id:id, name:p?.name, price:p?.price, layout });
+        alert(`(실험용) 장바구니 담기: ${p?.name}`);
+      }
+    });
+
+    // search input (just updates title text)
+    document.getElementById("q").addEventListener("input", ()=>{
+      render();
+    });
+
+    // init
+    render();
+
+    // For experiments: expose helper
+    window.__demo = {
+      setLayout: (v)=>{ layout=v; render(); },
+      getLayout: ()=>layout
+    };
+  </script>
+</body>
+</html>
