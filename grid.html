@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실험용 스토어 - 카테고리</title>
+
+    <style>
+        :root { --primary-color: #3498db; --bg-gray: #f8f9fa; --border-color: #ddd; }
+        body { font-family: 'Pretendard', sans-serif; margin: 0; display: flex; background: var(--bg-gray); color: #333; }
+        
+        /* 왼쪽 필터 바 */
+        aside { width: 250px; background: white; padding: 20px; border-right: 1px solid var(--border-color); height: 100vh; position: sticky; top: 0; }
+        .filter-group { margin-bottom: 25px; }
+        .filter-group h3 { font-size: 16px; margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 5px; }
+        .filter-item { margin: 8px 0; font-size: 14px; display: flex; align-items: center; cursor: pointer; }
+        .filter-item input { margin-right: 8px; }
+
+        /* 오른쪽 상품 그리드 */
+        main { flex: 1; padding: 30px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
+        .product-card { background: white; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; transition: transform 0.2s; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .product-img { width: 100%; height: 220px; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #999; }
+        .product-info { padding: 15px; }
+        .brand { font-size: 12px; color: #888; margin-bottom: 5px; }
+        .name { font-size: 14px; font-weight: bold; margin-bottom: 8px; height: 40px; overflow: hidden; }
+        .price-row { display: flex; align-items: center; gap: 8px; }
+        .discount { color: #e74c3c; font-weight: bold; }
+        .price { font-size: 18px; font-weight: 800; }
+        .badge { display: inline-block; background: #eee; padding: 2px 6px; font-size: 11px; margin-top: 8px; border-radius: 4px; }
+
+        /* 실험용 타겟 버튼 */
+        .buy-btn { width: 100%; padding: 10px; background: white; border: 1px solid #333; margin-top: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .buy-btn:hover { background: #333; color: white; }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="filter-group">
+            <h3>정렬</h3>
+            <div class="filter-item"><input type="checkbox"> 공식브랜드</div>
+            <div class="filter-item"><input type="checkbox"> 무료배송</div>
+            <div class="filter-item"><input type="checkbox"> ★ 4.0 이상</div>
+        </div>
+        <div class="filter-group">
+            <h3>가격</h3>
+            <input type="range" style="width: 100%;">
+            <div style="font-size: 12px; margin-top: 5px;">10,000원 ~ 100,000원</div>
+        </div>
+    </aside>
+
+    <main>
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="product-img">IMAGE</div>
+                <div class="product-info">
+                    <div class="brand">슈퍼 가젯</div>
+                    <div class="name">갤럭시 Z폴드 6 투명 맥세이프 케이스</div>
+                    <div class="price-row">
+                        <span class="discount">19%</span>
+                        <span class="price">18,900원</span>
+                    </div>
+                    <div class="badge">오늘출발</div>
+                    <button class="buy-btn" id="cta-button-1">장바구니 담기</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-img">IMAGE</div>
+                <div class="product-info">
+                    <div class="brand">테크 플러스</div>
+                    <div class="name">45W 초고속 충전기 (C타입)</div>
+                    <div class="price-row">
+                        <span class="discount">10%</span>
+                        <span class="price">23,500원</span>
+                    </div>
+                    <div class="badge">무료배송</div>
+                    <button class="buy-btn" id="cta-button-2">장바구니 담기</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-img">IMAGE</div>
+                <div class="product-info">
+                    <div class="brand">B-블록</div>
+                    <div class="name">프리미엄 가죽 가로형 지갑 케이스</div>
+                    <div class="price-row">
+                        <span class="discount">25%</span>
+                        <span class="price">32,000원</span>
+                    </div>
+                    <div class="badge">BEST</div>
+                    <button class="buy-btn" id="cta-button-3">장바구니 담기</button>
+                </div>
+            </div>
+            
+            </div>
+    </main>
+
+</body>
+</html>
