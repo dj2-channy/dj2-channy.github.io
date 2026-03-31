@@ -223,8 +223,8 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
 
         if (percent >= 50 && !window.sentVwoScrollEvent) {
             // VWO 전용 API를 사용하여 이벤트 전송
-            window.vwo = window.vwo || function() { (window.vwo.q = window.vwo.q || []).push(arguments); };
-            window.vwo('event', 'scroll_50');
+            window.vwo = window.vwo || [];
+            window.vwo.push(['event', 'scroll_50']);
             
             window.sentVwoScrollEvent = true;
             console.log("VWO 스크롤 50% 이벤트 전송 완료!");
