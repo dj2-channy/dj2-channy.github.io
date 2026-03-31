@@ -59,7 +59,7 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
     <aside>
         <div class="filter-group">
             <h3>정렬</h3>
-            <div class="filter-item"><input type="checkbox"> 공식브랜</div>
+            <div class="filter-item"><input type="checkbox"> 공식브랜드</div>
             <div class="filter-item"><input type="checkbox"> 무료배송</div>
             <div class="filter-item"><input type="checkbox"> ★ 4.0 이상</div>
         </div>
@@ -128,9 +128,9 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
         let percent = (h[st]||b[st]) / ((h[sh]||b[sh]) - h.clientHeight) * 100;
 
         if (percent >= 50 && !window.sentVwoScrollEvent) {
-            // VWO 이벤트 전송 방식 최적화 (에러 방지)
-            window._vwo_code = window._vwo_code || [];
-            window._vwo_code.push(['event', 'scroll_50']);
+            // VWO 전용 API를 사용하여 이벤트 전송
+            window.vwo = window.vwo || function() { (window.vwo.q = window.vwo.q || []).push(arguments); };
+            window.vwo('event', 'scroll_50');
             
             window.sentVwoScrollEvent = true;
             console.log("VWO 스크롤 50% 이벤트 전송 완료!");
