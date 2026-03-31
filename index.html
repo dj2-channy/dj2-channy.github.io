@@ -120,7 +120,6 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
 <!-- Start 스크롤 50% 측정 Code -->
 <script>
     window.addEventListener('scroll', function() {
-        // 현재 스크롤 위치 계산
         let h = document.documentElement, 
             b = document.body,
             st = 'scrollTop',
@@ -128,11 +127,12 @@ if(f=!1,v=d.querySelector('#vwoCode'),cc={},-1<d.URL.indexOf('__vwo_disable__')|
         
         let percent = (h[st]||b[st]) / ((h[sh]||b[sh]) - h.clientHeight) * 100;
 
-        // 스크롤이 50%를 넘었을 때 VWO에 이벤트 전송
         if (percent >= 50 && !window.sentVwoScrollEvent) {
-            window.vwoCode = window.vwoCode || [];
-            window.vwoCode.push(['event', 'scroll_50']); 
-            window.sentVwoScrollEvent = true; 
+            // VWO 이벤트 전송 방식 최적화 (에러 방지)
+            window._vwo_code = window._vwo_code || [];
+            window._vwo_code.push(['event', 'scroll_50']);
+            
+            window.sentVwoScrollEvent = true;
             console.log("VWO 스크롤 50% 이벤트 전송 완료!");
         }
     });
